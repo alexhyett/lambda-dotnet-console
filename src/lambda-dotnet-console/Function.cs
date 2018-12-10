@@ -9,6 +9,10 @@ using Amazon.Lambda.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using Newtonsoft.Json.Linq;
+
+using Serilog;
+
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly : LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -16,6 +20,8 @@ namespace lambda_dotnet_console
 {
     public class Function
     {
+        private AppSettings _appSettings;
+        private ILogger _logger;
 
         /// <summary>
         /// Lamda Function
@@ -31,20 +37,30 @@ namespace lambda_dotnet_console
                 .AddEnvironmentVariables(prefix: "LAMBDA_")
                 .Build();
 
+            _appSettings = new AppSettings();
+            configuration.GetSection("App").Bind(_appSettings);
+
+            _logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .Destructure.AsScalar<JObject>()
+                .Destructure.AsScalar<JArray>()
+                .CreateLogger();
+
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
-            var appSettings = new AppSettings();
-            configuration.GetSection("App").Bind(appSettings);
-            serviceCollection.AddSingleton<AppSettings>(appSettings);
-
             var serviceProvider = serviceCollection.BuildServiceProvider();
-            return serviceProvider.GetService<App>().Run(input);
+            var result = serviceProvider.GetService<App>().Run(input);
+            Log.CloseAndFlush();
+            return result;
         }
 
-        private static void ConfigureServices(IServiceCollection serviceCollection)
+        private void ConfigureServices(IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<App>();
+            serviceCollection.AddSingleton<AppSettings>(_appSettings);
+            serviceCollection.AddSingleton<ILogger>(_logger);
+            serviceCollection.AddLogging(logBuilder => logBuilder.AddSerilog(dispose: true));
         }
     }
 
