@@ -1,5 +1,7 @@
 # AWS Lambda .Net Core Console Example
 
+This is a boilerplate function for those looking to create lambda functions with .Net Core.
+
 This starter project consists of:
 
 - Function.cs - class file containing a class with a single function handler method

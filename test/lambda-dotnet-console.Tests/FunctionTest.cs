@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Xunit;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.TestUtilities;
 
 using lambda_dotnet_console;
+
+using Xunit;
 
 namespace lambda_dotnet_console.Tests
 {
@@ -22,7 +23,7 @@ namespace lambda_dotnet_console.Tests
             var context = new TestLambdaContext();
             var upperCase = function.FunctionHandler("hello world", context);
 
-            Assert.Equal("HELLO WORLD", upperCase);
+            Assert.Equal("TestHELLO WORLD", upperCase);
         }
     }
 }

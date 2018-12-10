@@ -17,5 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\lambda-dotnet-console\lambda-dotnet-console.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="appsettings.json" CopyToPublishDirectory="Always" CopyToOutputDirectory="PreserveNewest"/>
+  </ItemGroup>
 </Project>
